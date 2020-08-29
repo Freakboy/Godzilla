@@ -1,0 +1,71 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'vip.youwe'
+version '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'org.json', name: 'json', version: '20160810'
+    compile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
+    compile group: 'javax.servlet.jsp', name: 'javax.servlet.jsp-api', version: '2.3.3'
+    compile(group: "mysql", name: "mysql-connector-java", version: "5.1.47")
+    compile(group: "org.xerial", name: "sqlite-jdbc", version: "3.21.0")
+    // https://mvnrepository.com/artifact/asm/asm-all
+    compile group: 'asm', name: 'asm-all', version: '3.3.1'
+}
+
+task hello {
+    print("${projectDir}")
+}
+
+
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+mainClassName = 'vip.youwe.shell.core.ui.MainActivity'
+
+task copyResources(type: Copy) {
+    from "${projectDir}/src/main/resources"
+    into "${buildDir}/classes/java/main"
+}
+
+//processResources.dependsOn(copyResources)
+processResources {
+    exclude("**/*.db")
+}
+
+task copyTaskWithPatterns(type: Copy) {
+    from 'src/main/java'
+    into 'build/classes/java/main'
+    include '**/*.dll'
+    include '**/*.bin'
+    include '**/*.txt'
+    include '**/*.ashx'
+    include '**/*.asmx'
+    include '**/*.aspx'
+    include '**/*.classs'
+    include '**/*.jsp'
+    include '**/*.jspx'
+    include '**/*.php'
+}
+
+processResources.dependsOn(copyTaskWithPatterns)
+
+
+jar {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest {
+        attributes 'Main-Class': 'vip.youwe.shell.core.ui.MainActivity'
+    }
+}
